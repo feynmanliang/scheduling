@@ -6,16 +6,16 @@ object Solution extends App {
     val intervalId: Int
     val userId: Int
   }
+  case class Interval(startTime: Int, stopTime: Int)
   case class Start(
     override val time: Int,
     override val intervalId: Int,
     override val userId: Int) extends Time
   case class End(
-
     override val time: Int,
+    val date: Double,
     override val intervalId: Int,
     override val userId: Int) extends Time
-  case class Interval(startTime: Int, stopTime: Int)
 
   def merge(busyIntervals: List[List[Interval]]): List[Time] = {
     busyIntervals.zipWithIndex.flatMap { case (user, userId) =>
@@ -38,19 +38,19 @@ object Solution extends App {
     val active = mutable.Set[(Int, Int)]()
     for (t <- startStopTimes) {
       t match {
-        case Start(time, intervalId, userId) => {
-          active.add((intervalId, userId))
-          if (isFree && freeStart != time) {
-            res += Interval(freeStart, time)
-          }
-          isFree = false
-        }
         case End(time, intervalId, userId) => {
           active.remove((intervalId, userId))
           if (active.isEmpty) {
             isFree = true
             freeStart = t.time
           }
+        }
+        case Start(time, intervalId, userId) => {
+          active.add((intervalId, userId))
+          if (isFree && freeStart != time) {
+            res += Interval(freeStart, time)
+          }
+          isFree = false
         }
       }
     }
@@ -59,8 +59,7 @@ object Solution extends App {
   }
 
   val in1 = List(
-    List(Interval(1, 3), Interval(6, 7)),
-    List(Interval(2, 5), Interval(7, 8))
+    List(Interval(1, 3), Interval(6, 7))
   )
 
   println(merge(in1))
